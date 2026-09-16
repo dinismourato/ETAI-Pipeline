@@ -1,5 +1,24 @@
 # Baseline Predictive Pipeline -- ETAI
 
+
+
+20261121
+
+DT:
+Train accuracy: 0.829
+Test accuracy:  0.624
+Gap (train - test): +0.205
+
+
+
+LR: Train accuracy: 0.679
+Test accuracy:  0.679
+Gap (train - test): -0.000
+
+
+Current best model: The current best model is Linear Regression since the Decision Tree has an overfitting in the training accuracy compared to the test accuracy with a difference between the two results of 0.205. This can be explained since there are no parameters being defined in the decision tree. To summarized, the linear regression is the best model to choose due to the difference of the train accuracy and the test accuracy is 0, so indeed there is no underfitting or overfitting.  
+
+
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
 
 The task: predict two-year recidivism using ProPublica's COMPAS
