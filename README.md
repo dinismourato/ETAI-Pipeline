@@ -2,21 +2,38 @@
 
 
 
-20261121
+20261121 - Dinis Pinto 
 
-DT:
+
+Comparing the results from week 1 and week 2: 
+
+Week 1: 
+logistic_regression
+Train accuracy: 0.679
+Test accuracy:  0.679
+Gap (train - test): -0.000
+
+
+decision_tree
 Train accuracy: 0.829
 Test accuracy:  0.624
 Gap (train - test): +0.205
 
 
+Week 2: 
+logistic_regression
+Train accuracy: 0.680
+Test accuracy:  0.676
+Gap (train - test): +0.004
 
-LR: Train accuracy: 0.679
-Test accuracy:  0.679
-Gap (train - test): -0.000
+
+decision_tree
+Train accuracy: 0.829
+Test accuracy:  0.625
+Gap (train - test): +0.204
 
 
-Current best model: The current best model is Linear Regression since the Decision Tree has an overfitting in the training accuracy compared to the test accuracy with a difference between the two results of 0.205. This can be explained since there are no parameters being defined in the decision tree. To summarized, the linear regression is the best model to choose due to the difference of the train accuracy and the test accuracy is 0, so indeed there is no underfitting or overfitting.  
+Conclusion of the results: Troughtout the last 2 weeks we were able to explore two different models being used: logistic regression params={'max_iter': 1000} and decision tree with params = {}. Comparing both models in week 1, its fascinating to see that logistic regression has the capability of performing better contrasted to the decision tree since for the logistic the gap between the train and test accuracy is zero and for the decision tree is 0.205. In week 2, with the introduction of the preprocessing we were able to clean parts of the data, with null values and correct values that appear with irregular spaces and gaps in some words. The good part of using this type of approach is that our data gets cleanear and better for modelling but can also contributte for our model to have less data and in consequence can weak our model being use and the performance can be altered. This behaviour being describe, is exactly what happens to Logistic regression. In week 2, this model performs a gap of 0.04, which means a growth of our error in the model and this implies our model not predicting so well (in the majority of the time it does) compared to week 1. The same trend does not happen with decision tree, but also does not improve our model in a significant way, with only a reduction of 0.01 (gap). Summarizing, the preprocessing unfortunaly didnt contribute for the better performance for both models. 
 
 
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
