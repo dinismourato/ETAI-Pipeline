@@ -26,8 +26,8 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, RobustScaler
-from category_encoders import CountEncoder, TargetEncoder
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, RobustScaler, TargetEncoder
+from category_encoders import CountEncoder #TargetEncoder
 
 
 
@@ -136,6 +136,22 @@ _ENCODERS = {
 }
 
 
+def split_dev_test(X, y, extras, test_size: float, random_state: int):
+    """
+    Sets the final test set aside (week 4 -- replaces week 2/3's `split_train_test`).
+
+    Stratified split of X, y and the extras frame (race/score_text, kept for the fairness
+    report) together, so all three stay row-aligned. Returns a *development* set and a
+    *locked test set*:
+      - development set: everything we're allowed to learn from and compare models on.
+        Cross-validation (src/evaluate.py) splits it again into train/validation folds.
+      - locked test set: never used to fit, tune, compare or choose anything. Its size and seed live in config.yaml's `test_set` section and are never changed after today.
+    """
+    X_dev, X_test, y_dev, y_test, extras_dev, extras_test = train_test_split(
+        X, y, extras, test_size=test_size, random_state=random_state, stratify=y
+    )
+    return X_dev, X_test, y_dev, y_test, extras_dev, extras_test
+
 def build_preprocessor(preprocessing_config: dict) -> ColumnTransformer:
     """
     Factory: builds a leak-safe ColumnTransformer for this week's chosen encoder/scaler
@@ -153,7 +169,8 @@ def build_preprocessor(preprocessing_config: dict) -> ColumnTransformer:
 
     scaler_factory = _SCALERS[scaler_name]
     scaler = scaler_factory() if callable(scaler_factory) else scaler_factory
-    encoder = _ENCODERS[encoder_name]()
+    encoder = _ENCODERS[encoder_name](preprocessing_config.get("random_state"))
+
 
     numeric_pipeline = Pipeline([
         ("impute", SimpleImputer(strategy=imputation.get("numeric_strategy", "median"))),

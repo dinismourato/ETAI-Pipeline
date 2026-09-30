@@ -5,6 +5,8 @@ from sklearn.tree import DecisionTreeClassifier
 _MODELS = {
     "logistic_regression": LogisticRegression,
     "decision_tree": DecisionTreeClassifier,
+    "random_forest": "RandomForestClassifier",  # Placeholder for future implementation
+    "dummy_model": "DummyClassifier",  # Placeholder for future implementation
 }
 
 
