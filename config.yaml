@@ -9,7 +9,7 @@ data:
   # check found redundant (see src/data_diagnostics.py + the EDA notebook's VIF walkthrough)
   drop_columns: ["id", "decile_score", "score_text", "prior_offenses", "age_in_months", "juvenile_total"]
 
-split:
+test_set:
   test_size: 0.2
   random_state: 42
 
@@ -62,6 +62,7 @@ preprocessing:
   numeric_features: ["age", "juv_fel_count", "juv_misd_count", "juv_other_count", "priors_count"]
   categorical_features: ["sex", "age_cat", "c_charge_degree"]
   mnar_indicator_sources: ["priors_count", "c_charge_degree"]
+  random_state: 42
   imputation:
     numeric_strategy: "median"        # applies to age, juv_fel_count, juv_misd_count, juv_other_count, priors_count
     categorical_strategy: "most_frequent"   # applies to sex, age_cat, c_charge_degree
@@ -77,7 +78,7 @@ preprocessing:
 #    max_iter: 2000
 
 model:
-  type: "dummy_model"   # or "decision_tree"
+  type: "dummy"   # or "decision_tree"
   params: {}
     #max_iter: 2000
 
