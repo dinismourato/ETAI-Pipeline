@@ -10,7 +10,7 @@ data:
   drop_columns: ["id", "decile_score", "score_text", "prior_offenses", "age_in_months", "juvenile_total"]
 
 test_set:
-  test_size: 0.2
+  size: 0.2
   random_state: 42
 
 # New this week (see Practical/W3/notebooks/01_eda_introduction.ipynb): what src/data_diagnostics.py
@@ -77,17 +77,17 @@ preprocessing:
 #  params: 
 #    max_iter: 2000
 
-model:
-  type: "dummy"   # or "decision_tree"
-  params: {}
-    #max_iter: 2000
-
 #model:
-#  type: "random_forest"   # or "decision_tree"
-#  params:
-#    n_jobs: -1
-#    max_depth: 5
-#    random_state: 42
+#  type: "dummy_model"   # or "decision_tree"
+#  params: {}
+#    #max_iter: 2000
+
+model:
+  type: "random_forest"   # or "decision_tree"
+  params:
+    n_jobs: -1
+    max_depth: 5
+    random_state: 42
 
 output:
   results_dir: "results"   # each run's full report is saved here as a timestamped .txt file
