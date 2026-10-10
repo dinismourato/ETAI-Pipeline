@@ -86,9 +86,9 @@ preprocessing:
     numeric_strategy: "median"        # applies to age, juv_fel_count, juv_misd_count, juv_other_count, priors_count
     categorical_strategy: "most_frequent"   # applies to sex, age_cat, c_charge_degree
 
-#model:
-#  type: "decision_tree"   # or "decision_tree"
-#  params: {}
+model:
+  type: "decision_tree"   # or "decision_tree"
+  params: {}
    # max_iter: 2000
 
 #model:
@@ -101,12 +101,24 @@ preprocessing:
  # params: {}
     #max_iter: 2000
 
-model:
-  type: "random_forest"   # or "decision_tree"
-  params:
-    n_jobs: -1
-    max_depth: 5
-    random_state: 42
+#model:
+#  type: "random_forest"   # or "decision_tree"
+#  params:
+#    n_jobs: -1
+#    max_depth: 5
+#    random_state: 42
+tuning:
+  enabled: true
+  n_trials: 30
+  n_splits: 5                                       # folds that score each candidate
+  random_state: 42                                  # seeds the sampler and those folds
+  # Keys are Pipeline parameter names. Types: int / float (low, high, log) or categorical (choices).
+  search_spaces:
+    decision_tree:
+      model__max_depth: {type: int, low: 1, high: 20}
+      model__min_samples_leaf: {type: int, low: 1, high: 200, log: true}
+      model__criterion: {type: categorical, choices: ["gini", "entropy"]}
+
 
 #output:
 #  results_dir: "results"   # each run's full report is saved here as a timestamped .txt file
