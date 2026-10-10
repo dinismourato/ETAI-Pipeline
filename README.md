@@ -76,7 +76,91 @@ Gap (train - test): +0.086
 ´
 Conclusion of the results: Throughtout this week there were main changes in the preprocessing.py, main.py, model.py, config.yaml and results.py. Going deep on each file, the preprocessing was the one that suffered internal changes in many functions used. 
 The function clean_dataset(), now can keep every single row and with the introduction of new data, it will do a new prediction. The function drop_duplicate_rows() removes lines and the ones that are duplicated. The split_dev_test(), separates in a new training-test setup with a split of 80-20 and the build_preprocessor() start using the library TargetEncoder. The main.py, now has a new methology, loads and cleans with the clean_dataset and then removes the duplicates with  drop_duplicate_rows. After that, it separates the features with the target and with the function split_dev_test it puts 20% as test and 80% as train. Finally merges the preprocessing and the model in a single pipeline function. In the model.py, there was the introduction of two new models, being the random forest and dummyclassifier. Config.yaml had a new section for the split: test_set (size:0.2, random.state =42). The result.py had a line with alteration being the config(test_set) added and elimination of config(split) for match with the other files. 
-Suceeding this description of the alterations in the project, and the 
+Suceeding this description of the alterations in the project, I had develop 4 different outputs, that can be seen up on this readmme file. The outputs in this week concern the two methods talked in the previous classes and with dummy and randomforest. Comparing both methods introducted in this week, dummy was obviously the worst one, since its the basic model and the overall accuracy in the test and train set are both 0.55. On the other hand, random forest gives a better version of results, with Train accuracy: 0.676 and Test accuracy:  0.658. So, we can conclude the performance of the random forest was way better than the basic model used, what allerts for good signs of performance but that can go way better with better coding. Comparing, random forest with the other two methods used in the previous classes, we can say positively that random forest is still the prefered algorithm to predict since the accuracy of both sets (train and test) are better. 
+
+
+Week 5: 
+Run: 20261010_194834
+Model: decision_tree  params={}
+Test size: 0.2  random_state: 42
+============================================================
+
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation   gap
+    1  0.695       0.624 0.071
+    2  0.714       0.585 0.129
+    3  0.687       0.594 0.093
+    4  0.679       0.620 0.059
+    5  0.692       0.614 0.078
+
+Train       mean = 0.693   std = 0.013
+Validation  mean = 0.607   std = 0.017
+Gap         mean = +0.086   std = 0.027
+
+
+Run: 20261010_195317
+Model: logistic_regression  params={'max_iter': 2000}
+Test size: 0.2  random_state: 42
+============================================================
+
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation    gap
+    1  0.676       0.680 -0.004
+    2  0.680       0.654  0.026
+    3  0.674       0.675 -0.001
+    4  0.672       0.688 -0.016
+    5  0.674       0.665  0.010
+
+Train       mean = 0.675   std = 0.003
+Validation  mean = 0.672   std = 0.013
+Gap         mean = +0.003   std = 0.016
+
+
+Run: 20261010_195336
+Model: dummy_model  params={}
+Test size: 0.2  random_state: 42
+============================================================
+
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation    gap
+    1  0.549       0.549  0.000
+    2  0.549       0.549 -0.000
+    3  0.549       0.549 -0.000
+    4  0.549       0.549 -0.000
+    5  0.549       0.549 -0.000
+
+Train       mean = 0.549   std = 0.000
+Validation  mean = 0.549   std = 0.000
+Gap         mean = -0.000   std = 0.000
+
+
+
+Run: 20261010_195404
+Model: random_forest  params={'n_jobs': -1, 'max_depth': 5, 'random_state': 42}
+Test size: 0.2  random_state: 42
+============================================================
+
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation    gap
+    1  0.692       0.677  0.015
+    2  0.698       0.656  0.042
+    3  0.687       0.701 -0.014
+    4  0.686       0.691 -0.004
+    5  0.688       0.682  0.006
+
+Train       mean = 0.690   std = 0.005
+Validation  mean = 0.681   std = 0.017
+Gap         mean = +0.009   std = 0.022
+
+
+
+Conclusion of the results: In this sector, there was the introduction of the cross validation. The validation got rid of only one division of the data. The pipeline started to have a cross validation with 5 folds, with the new definitions also attached in the config.yaml. The preprocessing is made in every single fold and the evaluation fold never influences his own pre-processing. Fariness is also calculated throughout the 5800 prediction, instead of one split test.
+With this new introduction of the cross validation our results dont depend on a simple split.
+Indeed for the random forest, last week there was an accuracy of Train accuracy: 0.688 and Test accuracy:  0.671, but with this new method now we have a Validation that means the mean of each 5 validation that occured and the final result is 0.607 and std of 0.017 for the 5 folds. Instead of having just one split that could hide the information about the validation now we can see in each fold the validation and the train accuracy and so we can see better if is overfitting. 
 
 
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.

@@ -9,9 +9,28 @@ data:
   # check found redundant (see src/data_diagnostics.py + the EDA notebook's VIF walkthrough)
   drop_columns: ["id", "decile_score", "score_text", "prior_offenses", "age_in_months", "juvenile_total"]
 
+# Week 4: the FINAL TEST SET. Carved out once, stratified, and locked: never used to fit,
+# tune, compare or choose anything. Used only for the final assessment.
+# Do not change these two values after week 4 -- a new seed would silently give you a
+# different (already partly "seen") test set.
+
 test_set:
   size: 0.2
   random_state: 42
+
+
+
+
+# Week 4: how models are evaluated -- stratified k-fold cross-validation on the
+# development set (everything except the locked test set). Same random_state = same folds on
+# every run, for every model, so comparisons are like-for-like.
+cv:
+  n_splits: 5
+  shuffle: true
+  random_state: 42
+  scoring: "accuracy"   # one metric for now, so numbers compare directly with weeks 2-3
+  n_jobs: 1             # folds fitted in parallel; -1 = all cores (only pays off for slow models, e.g. random forest)
+
 
 # New this week (see Practical/W3/notebooks/01_eda_introduction.ipynb): what src/data_diagnostics.py
 # and src/preprocessing.py need to stay generic instead of hardcoding COMPAS's column names.
@@ -67,9 +86,9 @@ preprocessing:
     numeric_strategy: "median"        # applies to age, juv_fel_count, juv_misd_count, juv_other_count, priors_count
     categorical_strategy: "most_frequent"   # applies to sex, age_cat, c_charge_degree
 
-model:
-  type: "decision_tree"   # or "decision_tree"
-  params: {}
+#model:
+#  type: "decision_tree"   # or "decision_tree"
+#  params: {}
    # max_iter: 2000
 
 #model:
@@ -78,16 +97,16 @@ model:
 #    max_iter: 2000
 
 #model:
-#  type: "dummy_model"   # or "decision_tree"
-#  params: {}
-#    #max_iter: 2000
+ # type: "dummy_model"   # or "decision_tree"
+ # params: {}
+    #max_iter: 2000
 
-#model:
-#  type: "random_forest"   # or "decision_tree"
-#  params:
-#    n_jobs: -1
-#    max_depth: 5
-#    random_state: 42
+model:
+  type: "random_forest"   # or "decision_tree"
+  params:
+    n_jobs: -1
+    max_depth: 5
+    random_state: 42
 
 #output:
 #  results_dir: "results"   # each run's full report is saved here as a timestamped .txt file
