@@ -162,6 +162,63 @@ Conclusion of the results: In this sector, there was the introduction of the cro
 With this new introduction of the cross validation our results dont depend on a simple split.
 Indeed for the random forest, last week there was an accuracy of Train accuracy: 0.688 and Test accuracy:  0.671, but with this new method now we have a Validation that means the mean of each 5 validation that occured and the final result is 0.607 and std of 0.017 for the 5 folds. Instead of having just one split that could hide the information about the validation now we can see in each fold the validation and the train accuracy and so we can see better if is overfitting. 
 
+Run: 20261019_221843
+Model: decision_tree  params={}
+Test size: 0.2  random_state: 42
+============================================================
+
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation   gap
+    1  0.692       0.631 0.061
+    2  0.721       0.612 0.109
+    3  0.689       0.599 0.090
+    4  0.683       0.619 0.064
+    5  0.686       0.608 0.078
+
+Train       mean = 0.694   std = 0.015
+Validation  mean = 0.614   std = 0.012
+Gap         mean = +0.080   std = 0.020
+
+Hyperparameters: 
+
+In this week the pipeline, had a different approach where it automatically choose itself the hyperparameters for  the model, instead of using pre defined valus. Comparing to last week, the decision tree had no limite in terms of dept and in this week it was redefined with max_depth, min_samples_leaf and the criterion with intervals defined in the new tuning section (on the config.yaml). The finding is done by Optuna and it tests 30 different combinations between each other. Each combination is validated by the cross validation used in the previous lecture. With this the preprocessing is reshaped in each fold. The median of the folds represent the median of each fold, The final hyperparameters, come from this new implementation with the whole dataset itself. With the output we can see the trend repoorted here happening where the folds have had better improvement. 
+
+Ensembles: 
+
+Oblique random forest 
+Nested CV (tuned model)
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation    gap  inner_best  model__estimator__tree__max_depth  model__estimator__tree__min_samples_leaf  model__estimator__project__n_components
+    1  0.688       0.677  0.011       0.680                                 26                                       104                                        7
+    2  0.706       0.659  0.047       0.689                                  7                                         3                                        7
+    3  0.687       0.691 -0.004       0.679                                  4                                        16                                        3
+    4  0.687       0.689 -0.002       0.679                                  8                                       122                                        3
+    5  0.693       0.679  0.014       0.680                                 25                                        56                                        9
+
+Train       mean = 0.692   std = 0.008
+Validation  mean = 0.679   std = 0.013
+Gap         mean = +0.013   std = 0.021
+
+Adaboost: 
+
+Nested CV (tuned model)
+Cross-validation (5 stratified folds, metric: accuracy)
+
+ fold  train  validation    gap  inner_best  model__estimator__max_depth  model__n_estimators  model__learning_rate
+    1  0.686       0.674  0.012       0.685                            2                  139                 0.084
+    2  0.693       0.658  0.036       0.689                            2                  337                 0.076
+    3  0.683       0.701 -0.018       0.678                            4                   55                 0.167
+    4  0.684       0.688 -0.004       0.676                            4                  187                 0.021
+    5  0.687       0.691 -0.004       0.682                            5                  138                 0.108
+
+Train       mean = 0.687   std = 0.004
+Validation  mean = 0.682   std = 0.017
+Gap         mean = +0.004   std = 0.020
+
+In this week the pipeline had new implementations with the ensemble, that combines different approaches of decision trees, such as adaboost and oblique random forests. In a theoretical way, adaboost gives a new perspective on how to make new decision trees, where it gives more weight to weak trees and the prediction is a precise vote measure. For the oblique random forest, it makes the divisions in  different shape, as inclined and not perpendicular, and this gives a more separated classes with a good balance between the diferent variables being used. The different files being used where not changed such as the preprocessing and tuning. The only alterations were made only in the model.py and config.yaml following the notebook from the lecture. For the oblique random it gave a train mean accuracy of 0.692 and the validation mean accuracy is 0.679 
+with some training model with a tree max depth over 26 and the leafs with over 100. The overall best trail was actually the number 7 out of the 30. For the adaboost, the best trail was number 8 overall, with the fold cross validation the it had a train mean accuracy of 0.687 and a validation mean accuracy of 0.682, what was slightly better compared to the oblique regression model. For the top 5 trial, they were 8,21,5,6,11 with similar accuracy(0.684-0.683). Comparing this two new models, to the other ones used in previous classes is cleared that they have better results compared to the other models used before. 
 
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
 
