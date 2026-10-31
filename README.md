@@ -220,6 +220,52 @@ Gap         mean = +0.004   std = 0.020
 In this week the pipeline had new implementations with the ensemble, that combines different approaches of decision trees, such as adaboost and oblique random forests. In a theoretical way, adaboost gives a new perspective on how to make new decision trees, where it gives more weight to weak trees and the prediction is a precise vote measure. For the oblique random forest, it makes the divisions in  different shape, as inclined and not perpendicular, and this gives a more separated classes with a good balance between the diferent variables being used. The different files being used where not changed such as the preprocessing and tuning. The only alterations were made only in the model.py and config.yaml following the notebook from the lecture. For the oblique random it gave a train mean accuracy of 0.692 and the validation mean accuracy is 0.679 
 with some training model with a tree max depth over 26 and the leafs with over 100. The overall best trail was actually the number 7 out of the 30. For the adaboost, the best trail was number 8 overall, with the fold cross validation the it had a train mean accuracy of 0.687 and a validation mean accuracy of 0.682, what was slightly better compared to the oblique regression model. For the top 5 trial, they were 8,21,5,6,11 with similar accuracy(0.684-0.683). Comparing this two new models, to the other ones used in previous classes is cleared that they have better results compared to the other models used before. 
 
+
+Week 7:
+
+Gradient Boosting
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.747       0.731 0.016     0.672              0.658      0.679   0.516 0.587    0.542    0.731              0.686
+    2  0.755       0.701 0.054     0.664              0.655      0.645   0.563 0.602    0.578    0.701              0.652
+    3  0.748       0.735 0.013     0.696              0.687      0.687   0.596 0.639    0.612    0.735              0.700
+    4  0.745       0.737 0.008     0.689              0.675      0.702   0.538 0.609    0.565    0.737              0.726
+    5  0.748       0.730 0.019     0.678              0.665      0.681   0.535 0.599    0.559    0.730              0.679
+
+                   mean   std
+accuracy          0.680 0.013
+balanced_accuracy 0.668 0.013
+precision         0.679 0.021
+recall            0.550 0.031
+f1                0.607 0.019
+fbeta_2           0.571 0.026
+roc_auc           0.727 0.015
+average_precision 0.689 0.027
+
+Histogram Gradient Boosting
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.771       0.723 0.049     0.672              0.668      0.637   0.633 0.635    0.634    0.723              0.682
+    2  0.786       0.683 0.103     0.634              0.630      0.597   0.581 0.589    0.584    0.683              0.639
+    3  0.769       0.731 0.039     0.668              0.668      0.624   0.663 0.643    0.655    0.731              0.704
+    4  0.774       0.729 0.045     0.688              0.683      0.662   0.629 0.645    0.635    0.729              0.723
+    5  0.774       0.719 0.055     0.674              0.671      0.640   0.635 0.637    0.636    0.719              0.661
+
+                   mean   std
+accuracy          0.667 0.020
+balanced_accuracy 0.664 0.020
+precision         0.632 0.024
+recall            0.628 0.030
+f1                0.630 0.023
+fbeta_2           0.629 0.027
+roc_auc           0.717 0.020
+average_precision 0.682 0.033
+
+naive_bayes
+
+
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
 
 The task: predict two-year recidivism using ProPublica's COMPAS
