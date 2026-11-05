@@ -10,7 +10,12 @@ Run with:
     -> (if tuning.enabled) nested CV + tuning on the selection metric
     -> reports (all metrics, confusion matrix, fairness) -> refit final model
     -> save the run (results/run_<id>.txt) and add it to the scoreboard (results/runs.csv)
+
+    Week 8: an optional feature-selection step ("select") between preprocessing and the model,
+    and a cache folder so its fits are reused across tuning trials.
 """
+import shutil
+import tempfile
 from datetime import datetime
 
 import optuna
@@ -60,7 +65,12 @@ def main():
           f"{cv_config['n_splits']}-fold CV")
     print(f"Data:  {len(X_dev)} development rows   |   {len(X_test)} test rows locked away (not used)")
 
-    pipeline = build_pipeline(config["preprocessing"], config["model"])
+    # week 8: feature selection (optional "select" step) + a cache folder for this run
+    selection_config = config.get("feature_selection") or {}
+    selection_enabled = selection_config.get("enabled", False)
+    print(f"Feature selection: {'on (min_votes=' + str(selection_config.get('min_votes', 2)) + ')' if selection_enabled else 'off'}")
+    cache_dir = tempfile.mkdtemp(prefix="pipeline_cache_")
+    pipeline = build_pipeline(config["preprocessing"], config["model"], selection_config, memory=cache_dir)
     floor_pipeline = build_pipeline(config["preprocessing"], {"type": "dummy"})
     floor_scores, _ = cross_validate_pipeline(floor_pipeline, X_dev, y_dev, cv,
                                               {selection_metric: scorers[selection_metric]}, selection_metric, n_jobs)
@@ -82,7 +92,10 @@ def main():
         if model_type not in search_spaces:
             raise ValueError(f"tuning is enabled but config.yaml has no tuning.search_spaces for "
                              f"'{model_type}'. Add one, or set tuning.enabled: false.")
-        search_space = search_spaces[model_type]
+        search_space = dict(search_spaces[model_type])
+        if selection_enabled:
+            # week 8: select__min_votes is tuned together with the model
+            search_space.update(selection_config.get("search_space") or {})
         n_trials = tuning_config["n_trials"]
         tuning_seed = tuning_config["random_state"]
         optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -118,23 +131,32 @@ def main():
     refit = f"Final model: {model_type} refit on all {len(X_dev)} development rows."
     report += "\n" + refit + "\n"
 
+    # week 8: the features the final model actually uses
+    kept = list(pipeline[:-1].get_feature_names_out())
+    all_features = list(pipeline.named_steps["prep"].get_feature_names_out())
+    features_kept = f"Features kept: {len(kept)} of {len(all_features)}: {', '.join(kept)}"
+    report += features_kept + "\n"
+
     row = {"run": run, "data": config["data"]["path"], "model": model_type, "tuned": tuning_enabled,
            "encoder": config["preprocessing"]["encoder"], "scaler": config["preprocessing"]["scaler"],
            "params": str(config["model"].get("params")), "tuned_params": str(study.best_params) if tuning_enabled else "",
            "metric": selection_metric, "mean": final_scores["validation"].mean(),
            "std": final_scores["validation"].std(ddof=1), "untuned": untuned, "floor": floor,
+           "feature_selection": "on" if selection_enabled else "off",
            **{f"fold_{i}": score for i, score in enumerate(final_scores["validation"], start=1)}}
     runs = save_scores(config.get("output", {}).get("scoreboard", "results/runs.csv"), row)
     same = runs[(runs["data"] == row["data"]) & (runs["metric"] == selection_metric)]
     board = (same.sort_values("mean", ascending=False)
-             [["run", "model", "tuned", "encoder", "scaler", "mean", "std", "untuned", "floor"]]
+             [["run", "model", "tuned", "feature_selection", "encoder", "scaler", "mean", "std", "untuned", "floor"]]
              .rename(columns={"mean": selection_metric})
              .to_string(index=False, float_format=lambda v: f"{v:.3f}"))
     print(f"\nScoreboard (runs on the same data and metric; best first)\n{board}")
     report += f"\nScoreboard:\n{board}\n"
 
     path = save_run(config.get("output", {}).get("results_dir", "results"), run, config, report)
+    shutil.rmtree(cache_dir, ignore_errors=True)        # week 8: delete this run's cache folder
     print(f"\n{refit}\nFull report (per-fold tables, tuning, confusion matrix, fairness): {path}")
+    print(features_kept)
 
 
 if __name__ == "__main__":

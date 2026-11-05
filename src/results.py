@@ -17,6 +17,7 @@ def save_run(results_dir: str, run: str, config: dict, report_text: str) -> str:
 
     cv = config["cv"]
     tuning = config.get("tuning", {})
+    selection = config.get("feature_selection") or {}
     header = (
         f"Run: {run}\n"
         f"Model: {config['model']['type']}  params={config['model'].get('params')}\n"
@@ -27,6 +28,8 @@ def save_run(results_dir: str, run: str, config: dict, report_text: str) -> str:
         f"Selection metric: {cv['selection_metric']}\n"
         f"Tuning: enabled={tuning.get('enabled', False)}  n_trials={tuning.get('n_trials')}  "
         f"n_splits={tuning.get('n_splits')}  random_state={tuning.get('random_state')}\n"
+        f"Feature selection: enabled={selection.get('enabled', False)}  min_votes={selection.get('min_votes')}  "
+        f"search_space={selection.get('search_space')}\n"
         + "=" * 60 + "\n\n"
     )
 
@@ -34,7 +37,6 @@ def save_run(results_dir: str, run: str, config: dict, report_text: str) -> str:
         f.write(header + report_text)
 
     return path
-
 
 def save_scores(path: str, row: dict) -> pd.DataFrame:
     """Appends one run to the CSV at `path` (created if needed) and returns all runs."""

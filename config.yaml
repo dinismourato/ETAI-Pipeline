@@ -68,9 +68,25 @@ preprocessing:
     numeric_strategy: "median"
     categorical_strategy: "most_frequent"
 
+feature_selection:
+  enabled: false
+  min_votes: 2                                      # 1 (keep almost all) .. 3 (keep only unanimous)
+  random_state: 42
+  search_space:                                     # tuned together with the model when tuning is on
+    select__min_votes: {type: int, low: 1, high: 3}
+
+
 model:
-  type: "naive_bayes"  # dummy | logistic_regression | naive_bayes | decision_tree | random_forest | oblique_random_forest | adaboost | gradient_boosting | hist_gradient_boosting
-  params: {}
+  type: "xgboost"   
+  params:
+    n_estimators: 300
+    learning_rate: 0.05
+    max_depth: 4
+    random_state: 42
+    n_jobs: -1
+#model:
+#  type: "naive_bayes"  # dummy | logistic_regression | naive_bayes | decision_tree | random_forest | oblique_random_forest | adaboost | gradient_boosting | hist_gradient_boosting
+#  params: {}
   # Other models' params, to swap in. class_weight "balanced" weights each class by 1 / its frequency
   # (GradientBoostingClassifier and GaussianNB have no class_weight).
   # logistic_regression:    {max_iter: 2000, class_weight: balanced}
@@ -84,7 +100,7 @@ model:
 #  params:
 #    random_state: 42
 tuning:
-  enabled: false
+  enabled: true
   n_trials: 30
   n_splits: 5                                       # folds that score each candidate
   random_state: 42                                  # seeds the sampler and those folds
@@ -117,3 +133,13 @@ tuning:
       model__max_iter: {type: int, low: 25, high: 500, log: true}
       model__learning_rate: {type: float, low: 0.01, high: 0.5, log: true}
       model__max_leaf_nodes:
+    xgboost:
+      model__n_estimators: {type: int, low: 50, high: 600, log: true}
+      model__learning_rate: {type: float, low: 0.01, high: 0.3, log: true}
+      model__max_depth: {type: int, low: 1, high: 8}
+      model__min_child_weight: {type: float, low: 1.0, high: 50.0, log: true}
+      model__subsample: {type: float, low: 0.5, high: 1.0}
+      model__colsample_bytree: {type: float, low: 0.5, high: 1.0}
+      model__reg_lambda: {type: float, low: 0.01, high: 10.0, log: true}
+      model__reg_alpha: {type: float, low: 0.001, high: 10.0, log: true}
+      model__gamma: {type: float, low: 0.0, high: 5.0}

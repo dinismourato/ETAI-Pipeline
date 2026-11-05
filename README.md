@@ -265,6 +265,137 @@ average_precision 0.682 0.033
 
 naive_bayes
 
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation    gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.686       0.690 -0.004     0.623              0.592      0.719   0.271 0.393    0.309    0.690              0.640
+    2  0.691       0.667  0.024     0.618              0.589      0.668   0.302 0.416    0.339    0.667              0.598
+    3  0.684       0.697 -0.013     0.618              0.587      0.687   0.279 0.397    0.316    0.697              0.632
+    4  0.686       0.684  0.002     0.637              0.605      0.756   0.287 0.416    0.327    0.684              0.662
+    5  0.685       0.686 -0.001     0.614              0.584      0.674   0.279 0.395    0.316    0.686              0.636
+
+                   mean   std
+accuracy          0.622 0.009
+balanced_accuracy 0.592 0.008
+precision         0.701 0.037
+recall            0.283 0.012
+f1                0.403 0.012
+fbeta_2           0.322 0.012
+roc_auc           0.685 0.011
+average_precision 0.634 0.023
+
+
+In this week we implemented 3 new models to the pipeline. Firstly, the gradient boosting that puts together the trees of regression one by one and each new tree learns from the residuals that were before. Comparing this new model to the random forest, it can generate more overfitting, and with that being said the model is adjusted to not happen this case. Secondly, the HistGradientBoosting that does the same as the previous model mention but groups each variable in a interval before training it. Thirdly, the naive bayes that is a probabilistic model. Each of them is configured in the config.yaml and in the model.py. The evaluation also suffered some changes, particulary in the accuracy, precision, recall, F1, ROC-AUC and average precision. It was also introducted a new method, the confusion matrix. Also, the same philosophy was aplied as the previous week, so the best prediction between the best 8 is the one choosen. 
+For the first model mentioned it had an mean accuracy of 0.680 with a standard deviation of 0.013. The F1 score had a amount of  0.607  and with a standard deviation of 0.019. Across all metrics applied the average precision was 0.689 and standard deviation of 0.027. 
+
+For the second model mentioned it had an mean accuracy of 0.667 with a standard deviation of 0.020. The F1 score had a amount of 0.630 and with a standard deviation of 0.023. Across all metrics applied the average precision was 0.682 and standard deviation of 0.033. 
+
+For the third model mentioned it had an mean accuracy of 0.622 with a standard deviation of 0.009. The F1 score had a amount of 0.403 and with a standard deviation of 0.012. Across all metrics applied the average precision was 0.634 and standard deviation of 0.023.
+Comparing this three models in term of precision and the performance of them is safe to say that the Gradient Boosting had the better results to it but it was not so much better comparing to the histogram gradient boosting in terms of accuracy. If we compare this two models in terms of F1 score, the gradient boosting gets passed by the histogram gradient boosting for a margin of approximaticaly 0.3. The nave bayes, is the one that performs worst compared to the other two models mentioned in every single metric mentioned. To summarize, is important to know that gradient boosting and histogram grandient boosting have similar results since they follow up the same structure of the algorithm, so gradient boosting in terms of accuracy is slightly better than histogram gradient boosting but with a small margin. 
+
+
+Week 8: 
+
+Model: xgboost  params={'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+Locked test set: size=0.2  random_state=42  (not used for evaluation)
+CV: 5 stratified folds  random_state=42
+Metrics: ['accuracy', 'balanced_accuracy', 'precision', 'recall', 'f1', 'fbeta_2', 'roc_auc', 'average_precision']
+Selection metric: roc_auc
+Tuning: enabled=False  n_trials=30  n_splits=5  random_state=42
+Feature selection: enabled=True  min_votes=2  search_space={'select__min_votes': {'type': 'int', 'low': 1, 'high': 3}}
+============================================================
+
+Hyperparameters from config.yaml: {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.749       0.718 0.031     0.667              0.654      0.665   0.526 0.587    0.549    0.718              0.676
+    2  0.750       0.700 0.049     0.660              0.652      0.640   0.563 0.599    0.577    0.700              0.655
+    3  0.747       0.727 0.021     0.687              0.676      0.687   0.562 0.618    0.583    0.727              0.699
+    4  0.746       0.725 0.021     0.676              0.662      0.683   0.523 0.593    0.549    0.725              0.713
+    5  0.747       0.733 0.014     0.679              0.667      0.682   0.540 0.603    0.564    0.733              0.692
+
+                   mean   std
+accuracy          0.674 0.011
+balanced_accuracy 0.662 0.010
+precision         0.671 0.020
+recall            0.543 0.019
+f1                0.600 0.012
+fbeta_2           0.564 0.016
+roc_auc           0.721 0.013
+average_precision 0.687 0.022
+
+
+Run: 20261105_180626
+Model: xgboost  params={'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+Locked test set: size=0.2  random_state=42  (not used for evaluation)
+CV: 5 stratified folds  random_state=42
+Metrics: ['accuracy', 'balanced_accuracy', 'precision', 'recall', 'f1', 'fbeta_2', 'roc_auc', 'average_precision']
+Selection metric: roc_auc
+Tuning: enabled=True  n_trials=30  n_splits=5  random_state=42
+Feature selection: enabled=True  min_votes=2  search_space={'select__min_votes': {'type': 'int', 'low': 1, 'high': 3}}
+============================================================
+
+Hyperparameters from config.yaml: {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.749       0.718 0.031     0.667              0.654      0.665   0.526 0.587    0.549    0.718              0.676
+    2  0.750       0.700 0.049     0.660              0.652      0.640   0.563 0.599    0.577    0.700              0.655
+    3  0.747       0.727 0.021     0.687              0.676      0.687   0.562 0.618    0.583    0.727              0.699
+    4  0.746       0.725 0.021     0.676              0.662      0.683   0.523 0.593    0.549    0.725              0.713
+    5  0.747       0.733 0.014     0.679              0.667      0.682   0.540 0.603    0.564    0.733              0.692
+
+                   mean   std
+accuracy          0.674 0.011
+balanced_accuracy 0.662 0.010
+precision         0.671 0.020
+recall            0.543 0.019
+f1                0.600 0.012
+fbeta_2           0.564 0.016
+roc_auc           0.721 0.013
+average_precision 0.687 0.022
+
+
+Run: 20261105_182136
+Model: xgboost  params={'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+Locked test set: size=0.2  random_state=42  (not used for evaluation)
+CV: 5 stratified folds  random_state=42
+Metrics: ['accuracy', 'balanced_accuracy', 'precision', 'recall', 'f1', 'fbeta_2', 'roc_auc', 'average_precision']
+Selection metric: roc_auc
+Tuning: enabled=True  n_trials=30  n_splits=5  random_state=42
+Feature selection: enabled=False  min_votes=2  search_space={'select__min_votes': {'type': 'int', 'low': 1, 'high': 3}}
+============================================================
+
+Hyperparameters from config.yaml: {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 4, 'random_state': 42, 'n_jobs': -1}
+
+Cross-validation (5 stratified folds, selection metric: roc_auc)
+
+ fold  train  validation   gap  accuracy  balanced_accuracy  precision  recall    f1  fbeta_2  roc_auc  average_precision
+    1  0.759       0.733 0.026     0.672              0.659      0.674   0.528 0.592    0.552    0.733              0.685
+    2  0.765       0.694 0.071     0.657              0.648      0.636   0.558 0.594    0.572    0.694              0.651
+    3  0.753       0.733 0.019     0.699              0.694      0.676   0.638 0.657    0.646    0.733              0.699
+    4  0.754       0.736 0.018     0.689              0.676      0.696   0.550 0.614    0.574    0.736              0.726
+    5  0.757       0.724 0.033     0.683              0.670      0.688   0.542 0.606    0.566    0.724              0.671
+
+                   mean   std
+accuracy          0.680 0.016
+balanced_accuracy 0.669 0.017
+precision         0.674 0.023
+recall            0.563 0.043
+f1                0.613 0.026
+fbeta_2           0.582 0.037
+roc_auc           0.724 0.017
+average_precision 0.687 0.028
+
+
+
+XGBoost was added as a model, with new specification in his model (gamma, reg_alpha, reg_lambda and min_child_weight). There is an option selection criteria for the variables (class voteselector) between the prerpocessing and the model and is connected to the config.yaml with the min_votes that is fitted for each set with the model. Its important to do this function, because if we were depend with the cross validation it could have data leakage and it was mentioned in the pratical class, so is good to have this class to select the best variables with the majority of votes. In this week we cache the steps in order to run faster and acelarate the tuning. 
+
+
+
 
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
 
