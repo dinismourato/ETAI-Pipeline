@@ -100,11 +100,14 @@ def clean_dataset(df: pd.DataFrame, diagnostics_config: dict) -> pd.DataFrame:
     flag_invalid_values(out, diagnostics_config.get("validity_rules", {}))
 
     out = _canonicalize_categories(out, diagnostics_config.get("canonical_categories", {}), placeholder_tokens)
+        # week 9: placeholders in text columns that have no spelling map
+    out = _replace_placeholders(out, diagnostics_config.get("placeholder_columns", []), placeholder_tokens)
 
     columns_to_drop = [c for c in diagnostics_config.get("redundant_columns", []) if c in out.columns]
     out = out.drop(columns=columns_to_drop)
 
     return out
+
 
 
 def drop_duplicate_rows(df: pd.DataFrame, id_column: str = None) -> pd.DataFrame:
@@ -131,7 +134,7 @@ def add_missingness_indicators(df: pd.DataFrame, mnar_indicator_sources: list) -
             out[f"{col}_was_missing"] = out[col].isna().astype(int)
     return out
 
-
+''''
 def split_features_target(df: pd.DataFrame, data_config: dict, mnar_indicator_sources: list):
     """
     Returns (X, y, extras). `y` is `None` and `extras` has no target column when called
@@ -151,6 +154,34 @@ def split_features_target(df: pd.DataFrame, data_config: dict, mnar_indicator_so
     feature_cols = [c for c in df.columns if c not in always_drop]
     X = df[feature_cols]
     return X, y, extras
+
+'''
+
+def split_features_target(df: pd.DataFrame, data_config: dict, mnar_indicator_sources: list):
+    """
+    Returns (X, y, extras). `y` is `None` and `extras` has no target column when called
+    on label-free inference data -- nothing downstream requires the target to be present.
+
+    Week 9: `extras` holds the sensitive attribute and, only if config.yaml names one in
+    `data.benchmark`, an existing score to compare against (COMPAS's `score_text`);
+    no column name is hard-coded any more.
+    """
+    target = data_config["target"]
+    sensitive_attr = data_config["sensitive_attr"]
+    drop_columns = data_config.get("drop_columns", [])
+    benchmark_column = (data_config.get("benchmark") or {}).get("column")
+
+    df = add_missingness_indicators(df, mnar_indicator_sources)
+    y = df[target] if target in df.columns else None
+
+    extras_cols = [c for c in [sensitive_attr, benchmark_column] if c and c in df.columns]
+    extras = df[extras_cols].copy() if extras_cols else None
+
+    always_drop = set(drop_columns) | {target, sensitive_attr}
+    feature_cols = [c for c in df.columns if c not in always_drop]
+    X = df[feature_cols]
+    return X, y, extras
+
 
 
 def split_dev_test(X, y, extras, test_size: float, random_state: int):
@@ -217,3 +248,21 @@ def build_preprocessor(preprocessing_config: dict) -> ColumnTransformer:
         ("categorical", categorical_pipeline, categorical_features),
         ("indicators", "passthrough", indicator_cols),
     ])
+
+
+    
+def _replace_placeholders(df: pd.DataFrame, columns: list, placeholder_tokens: set) -> pd.DataFrame:
+    """
+    Week 9: turns placeholder tokens (e.g. "?") into real missing values in the listed text
+    columns. Until now this only happened inside `_canonicalize_categories`, i.e. only in
+    columns that also had a spelling map -- a column with placeholders but no spelling
+    variants (Adult's workclass, occupation, native_country) kept "?" as a category.
+    """
+    out = df.copy()
+    for col in columns:
+        if col not in out.columns:
+            continue
+        is_placeholder = out[col].notna() & out[col].astype(str).str.strip().isin(placeholder_tokens)
+        out.loc[is_placeholder, col] = np.nan
+    return out
+    

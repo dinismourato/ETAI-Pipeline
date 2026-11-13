@@ -2,7 +2,8 @@
 Entry point for the baseline predictive pipeline.
 
 Run with:
-    python main.py
+    python main.py                      # COMPAS (config.yaml)
+    python main.py config_adult.yaml    # week 9: any other config file
 
     load config -> load data -> clean -> drop duplicates (training data only)
     -> features/target -> dev/test split (test set locked)
@@ -10,11 +11,14 @@ Run with:
     -> (if tuning.enabled) nested CV + tuning on the selection metric
     -> reports (all metrics, confusion matrix, fairness) -> refit final model
     -> save the run (results/run_<id>.txt) and add it to the scoreboard (results/runs.csv)
+    -> (week 9, if the config has a `predict` section) predict a file of new, unlabelled rows
 
     Week 8: an optional feature-selection step ("select") between preprocessing and the model,
     and a cache folder so its fits are reused across tuning trials.
 """
+import os
 import shutil
+import sys
 import tempfile
 from datetime import datetime
 
@@ -35,8 +39,34 @@ def load_config(path: str = "config.yaml") -> dict:
         return yaml.safe_load(f)
 
 
-def main():
-    config = load_config()
+def predict_new_data(pipeline, config: dict) -> str:
+    """
+    Week 9: predicts the unlabelled rows of `predict.path` with the refit pipeline. Same
+    cleaning as the training data but no `drop_duplicate_rows` (every row needs a prediction)
+    and no target; writes id, probability and 0/1 prediction (probability >= threshold).
+    Rows out = rows in.
+    """
+    predict_config = config["predict"]
+    new_raw = load_data(predict_config["path"])
+    new_clean = clean_dataset(new_raw, config["diagnostics"])
+    mnar_sources = config["preprocessing"].get("mnar_indicator_sources", [])
+    X_new, _, _ = split_features_target(new_clean, config["data"], mnar_sources)
+
+    id_column = config["diagnostics"]["id_column"]
+    threshold = predict_config.get("threshold", 0.5)
+    proba = pipeline.predict_proba(X_new)[:, 1]
+    predictions = new_clean[[id_column]].copy()
+    predictions["probability"] = proba
+    predictions["prediction"] = (proba >= threshold).astype(int)
+    assert len(predictions) == len(new_raw), "every new row must get a prediction"
+
+    os.makedirs(os.path.dirname(predict_config["output_path"]) or ".", exist_ok=True)
+    predictions.to_csv(predict_config["output_path"], index=False)
+    return predict_config["output_path"]
+
+
+def main(config_path: str = "config.yaml"):
+    config = load_config(config_path)
     run = datetime.now().strftime("%Y%m%d_%H%M%S")
     model_type = config["model"]["type"]
 
@@ -61,6 +91,7 @@ def main():
     selection_metric = cv_config["selection_metric"]
     scorers = build_scorers(metrics)
     n_jobs = cv_config.get("n_jobs", 1)
+    print(f"Config: {config_path}")
     print(f"Model: {model_type}   |   selection metric: {selection_metric}   |   "
           f"{cv_config['n_splits']}-fold CV")
     print(f"Data:  {len(X_dev)} development rows   |   {len(X_test)} test rows locked away (not used)")
@@ -125,7 +156,9 @@ def main():
     for name in metrics:
         print(f"  {name:<18s} {final_scores[name].mean():.3f} ± {final_scores[name].std(ddof=1):.3f}")
     report += "\n\n" + oof_classification_report(y_dev, oof_proba)
-    report += "\n" + fairness_report(y_dev, oof_proba, extras_dev, sensitive_attr=config["data"]["sensitive_attr"])
+    # week 9: the sensitive attribute and the optional benchmark score come from the config
+    report += "\n" + fairness_report(y_dev, oof_proba, extras_dev, sensitive_attr=config["data"]["sensitive_attr"],
+                                     benchmark=config["data"].get("benchmark"))
 
     pipeline.fit(X_dev, y_dev)
     refit = f"Final model: {model_type} refit on all {len(X_dev)} development rows."
@@ -158,6 +191,11 @@ def main():
     print(f"\n{refit}\nFull report (per-fold tables, tuning, confusion matrix, fairness): {path}")
     print(features_kept)
 
+    # week 9: predict new, unlabelled rows with the refit pipeline (only if the config asks for it)
+    if config.get("predict"):
+        predictions_path = predict_new_data(pipeline, config)
+        print(f"Predictions for {config['predict']['path']} saved to {predictions_path}")
+
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "config.yaml")

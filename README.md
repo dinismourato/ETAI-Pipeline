@@ -394,6 +394,8 @@ average_precision 0.687 0.028
 
 XGBoost was added as a model, with new specification in his model (gamma, reg_alpha, reg_lambda and min_child_weight). There is an option selection criteria for the variables (class voteselector) between the prerpocessing and the model and is connected to the config.yaml with the min_votes that is fitted for each set with the model. Its important to do this function, because if we were depend with the cross validation it could have data leakage and it was mentioned in the pratical class, so is good to have this class to select the best variables with the majority of votes. In this week we cache the steps in order to run faster and acelarate the tuning. 
 
+Result: 
+It was compared the XGBoost refined with nested dv, 30 trials and ROC-AUC with and without the variables selection in the same folds. Without selection the model uses the 10 variables and obtains a ROC-AUC of 0.738 with an interval of -+0.014. With the selection it uses only 2 (age and priors_count) and it obtains a slightly better result of 0.725 with + 0.013. The difference is really small compared to the variation in the folds and the t test doesnt consider really significant. We can conclude that the model with the selection is so go compared to the complete one, with only 2 of 10 variables and this implies to be easier the model, faster and simple to explain.
 
 
 

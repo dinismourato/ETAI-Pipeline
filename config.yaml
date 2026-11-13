@@ -6,6 +6,10 @@ data:
   target: "two_year_recid"
   sensitive_attr: "race"          # excluded from model features, used only to audit fairness
   drop_columns: ["id", "decile_score", "score_text", "prior_offenses", "age_in_months", "juvenile_total"]
+  benchmark:                          # week 9: an existing score to compare against in the fairness report
+    column: "score_text"
+    negative_value: "Low"             # every other value counts as "predicted to reoffend"
+    label: "COMPAS's own score"
 
 # Week 4: the FINAL TEST SET. Carved out once, stratified, and locked: never used to fit,
 # tune, compare or choose anything. Used only for the final assessment.
