@@ -399,6 +399,11 @@ It was compared the XGBoost refined with nested dv, 30 trials and ROC-AUC with a
 
 
 
+
+Week 9:
+
+
+
 This is the **starting point** for your semester project: a small but *complete* predictive pipeline -- every piece a real project needs (entry point, config, data loading, preprocessing, model, evaluation), just kept as simple as possible for now.
 
 The task: predict two-year recidivism using ProPublica's COMPAS

@@ -52,7 +52,7 @@ preprocessing:
     categorical_strategy: "most_frequent"
 
 feature_selection:
-  enabled: true
+  enabled: false
   min_votes: 2
   random_state: 42
   search_space:
